@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html lang="en" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html lang="en" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html lang="en" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>ION stats</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="app/app.css">
+  <script src="https://www.gstatic.com/firebasejs/3.6.3/firebase.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+  <script src="http://code.highcharts.com/highcharts.js"></script>
+  <script src="http://code.highcharts.com/modules/exporting.js"></script>
+  <script>
+      // Initialize Firebase
+      var config = {
+          apiKey: "AIzaSyAkvOKdL0bGnqW04uQV-N2yJcGQRvqd09o",
+          authDomain: "ion-monitor.firebaseapp.com",
+          databaseURL: "https://ion-monitor.firebaseio.com",
+          storageBucket: "ion-monitor.appspot.com",
+          messagingSenderId: "240543227300"
+      };
+      firebase.initializeApp(config);
+
+      var db = firebase.database();
+      var ref = db.ref();
+      var masternodesRef = ref.child("masternodes");
+
+      masternodesRef.on("child_added", function(data) {
+          var dataVal = data.val();
+
+          $('#masternodecount').highcharts().series[0].addPoint({
+              x: new Date(dataVal.moment),
+              y: dataVal.count
+          }, false);
+
+          $('#masternodecount').highcharts().redraw();
+      });
+
+
+  </script>
+</head>
+<body>
+  <div id="masternodecount" style="width: 800px; height: 400px;"></div>
+
+  <script>
+      $(document).ready(function() {
+          Highcharts.setOptions({
+              global: {
+                  useUTC: false
+              }
+          });
+
+          // set up highcharts
+          $('#masternodecount').highcharts({
+              chart: {
+                  type: 'spline'
+              },
+              title: {
+                  text: 'Masternode count'
+              },
+              xAxis: {
+                  type: 'datetime'
+              },
+              yAxis: {
+                  labels: {
+                      format: '{value} x'
+                  },
+                  title: {
+                      text: 'Count'
+                  }
+              },
+              legend: {
+                  enabled: false
+              },
+              exporting: {
+                  enabled: false
+              },
+              series: [{
+                  name: 'Count',
+                  yAxis: 0
+              }]
+          });
+      });
+  </script>
+
+</body>
+</html>
