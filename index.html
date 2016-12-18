@@ -9,43 +9,88 @@
   <title>ION stats</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!--<link rel="stylesheet" href="app/app.css">-->
-  <script src="//www.gstatic.com/firebasejs/3.6.3/firebase.js"></script>
-  <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
-  <script src="//code.highcharts.com/highcharts.js"></script>
-  <script src="//code.highcharts.com/modules/exporting.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="css/materialize.min.css" rel="stylesheet">
+  <script src="js/jquery.min.js"></script>
+  <script src="js/materialize.min.js"></script>
+  <style type="text/css">
+    .valign-wrapper{
+      min-height: 100vh;
+    }
+    /* fallback */
+    @font-face {
+      font-family: 'Material Icons';
+      font-style: normal;
+      font-weight: 400;
+      src: local('Material Icons'), local('MaterialIcons-Regular'), url(fonts/2fcrYFNaTjcS6g4U3t-Y5ZjZjT5FdEJ140U2DJYC3mY.woff2) format('woff2');
+    }
+
+    .material-icons {
+      font-family: 'Material Icons';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+    h4 {
+      padding: 10px 0;
+      background: rgb(2,40,68);
+        background: -moz-linear-gradient(left, rgba(2,40,68,1) 0%, rgba(4,100,166,1) 100%);
+        background: -webkit-linear-gradient(left, rgba(2,40,68,1) 0%,rgba(4,100,166,1) 100%);
+        background: linear-gradient(to right, rgba(2,40,68,1) 0%,rgba(4,100,166,1) 100%);
+        border-radius: 5px;
+    }
+  </style>
+  <script src="js/firebase.js"></script>
+  <script src="js/highcharts.js"></script>
+  <script src="js/exporting.js"></script>
   <script>
       // Initialize Firebase
       var config = {
-          apiKey: "AIzaSyAkvOKdL0bGnqW04uQV-N2yJcGQRvqd09o",
-          authDomain: "ion-monitor.firebaseapp.com",
-          databaseURL: "https://ion-monitor.firebaseio.com",
-          storageBucket: "ion-monitor.appspot.com",
-          messagingSenderId: "240543227300"
+        apiKey: "Your apikey",
+        authDomain: "Your authDomain",
+        databaseURL: "Your databaseURL",
+        storageBucket: "Your storageBucket",
+        messagingSenderId: "Your messagingSenderId"
       };
       firebase.initializeApp(config);
-
       var db = firebase.database();
       var ref = db.ref();
       var masternodesRef = ref.child("masternodes");
-
-      masternodesRef.on("child_added", function(data) {
+      masternodesRef.limitToLast(20).on("child_added", function(data) {
           var dataVal = data.val();
-
+          $("#count").html(dataVal.count);
           $('#masternodecount').highcharts().series[0].addPoint({
               x: new Date(dataVal.moment),
               y: dataVal.count
           }, false);
-
           $('#masternodecount').highcharts().redraw();
       });
-
-
   </script>
 </head>
 <body>
-  <div id="masternodecount" style="width: 800px; height: 400px;"></div>
-
+  <div class="row valign-wrapper">
+    <div class="container valign center">
+      <div class="col s12 m8 l6 offset-m2 offset-l3 darken-1 white-text">
+        <h4>Masternodes online</h4>
+        <h5 class="black-text" id="count">Loading...</h5>
+      </div>
+      <div class="col s12 m8 l6 offset-m2 offset-l3 darken-1 white-text">
+        <h4>Graph</h4>
+          <div class="col-sm-4 text-center">
+            <div id="masternodecount" style="width: 100%; height: 300px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
       $(document).ready(function() {
           Highcharts.setOptions({
@@ -53,21 +98,20 @@
                   useUTC: false
               }
           });
-
           // set up highcharts
           $('#masternodecount').highcharts({
               chart: {
                   type: 'spline'
               },
               title: {
-                  text: 'Masternode count'
+                  text: ''
               },
               xAxis: {
                   type: 'datetime'
               },
               yAxis: {
                   labels: {
-                      format: '{value} x'
+                      format: '{value}'
                   },
                   title: {
                       text: 'Count'
@@ -81,6 +125,7 @@
               },
               series: [{
                   name: 'Count',
+                  color: '#0464a6',
                   yAxis: 0
               }]
           });
